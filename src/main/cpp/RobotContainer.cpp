@@ -23,8 +23,10 @@
 #include "commands/autonomous/AutonomousRotateTurretCommand.h"
 #include "commands/DriveUntilWallCommand.h"
 #include "commands/FollowPolybezier.h"
+
 #include "commands/challenge/PickupCellsCommand.h"
 #include "commands/challenge/TestPixycamDetectorCommand.h"
+#include "commands/challenge/TestPixycamPositionCommand.h"
 
 using JoystickHand = frc::GenericHID::JoystickHand;
 
@@ -374,6 +376,7 @@ void RobotContainer::InitAutonomousChooser () {
     );
 
     TestPixycamDetectorCommand* testPixycamDetector = new TestPixycamDetectorCommand(m_Pixy);
+    TestPixycamPositionCommand* testPixycamPosition = new TestPixycamPositionCommand(m_Pixy);
 
     m_DashboardAutoChooser.SetDefaultOption("3 cell auto", threeCellAutoCommand);
     m_DashboardAutoChooser.AddOption("6 cell auto", sixCellAutoCommand);
@@ -383,6 +386,7 @@ void RobotContainer::InitAutonomousChooser () {
 
     m_DashboardAutoChooser.AddOption("pickup cells : challenge", pickupCellsChallenge);
     m_DashboardAutoChooser.AddOption("test pixycam detector", testPixycamDetector);
+    m_DashboardAutoChooser.AddOption("test pixycam position", testPixycamPosition);
 
 }
 
