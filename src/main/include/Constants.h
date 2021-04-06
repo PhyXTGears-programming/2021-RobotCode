@@ -1,5 +1,7 @@
 #pragma once
 
+#include <frc/SPI.h>
+
 namespace ConfigFiles {
     const std::string ConfigFile     = "config.toml";
     const std::string AutoConfigFile = "auto.toml";
@@ -125,3 +127,6 @@ namespace ControlPanelPins {
 
 // PCM 2
 constexpr int kPCM2 = Pins::CAN_15;
+
+// PixyCam
+constexpr frc::SPI::Port kPixycamSpi = frc::SPI::kOnboardCS0;
