@@ -23,6 +23,7 @@
 #include "commands/autonomous/AutonomousRotateTurretCommand.h"
 #include "commands/DriveUntilWallCommand.h"
 #include "commands/FollowPolybezier.h"
+#include "commands/challenge/PickupCellsCommand.h"
 
 using JoystickHand = frc::GenericHID::JoystickHand;
 
@@ -42,6 +43,8 @@ RobotContainer::RobotContainer () {
     m_Shooter = new Shooter(toml->get_table("shooter"));
     m_ControlPanel = new ControlPanel(toml->get_table("controlPanel"));
     m_PowerCellCounter = new PowerCellCounter();
+
+    m_Pixy = new Pixycam();
 
     auto nearSpeed = units::angular_velocity::revolutions_per_minute_t{
         toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.near").value_or(4400.0)
@@ -119,7 +122,7 @@ void RobotContainer::PollInput () {
     } else if (m_DriverJoystick.GetAButtonReleased() || m_OperatorJoystick.GetAButtonReleased()) {
         m_TeleopShootCommand->Cancel();
     }
-    
+
     // Slow shooting (operator: B)
     if (m_OperatorJoystick.GetBButtonPressed()) {
         m_TeleopSlowShootCommand->Schedule();
@@ -362,11 +365,20 @@ void RobotContainer::InitAutonomousChooser () {
         std::move(slalom_follower)
     );
 
+    PickupCellsCommand* pickupCellsChallenge = new PickupCellsCommand(
+        m_Drivetrain,
+        m_Intake,
+        m_Pixy,
+        followerConfig
+    );
+
     m_DashboardAutoChooser.SetDefaultOption("3 cell auto", threeCellAutoCommand);
     m_DashboardAutoChooser.AddOption("6 cell auto", sixCellAutoCommand);
     m_DashboardAutoChooser.AddOption("close auto", closeShotAutoCommand);
     m_DashboardAutoChooser.AddOption("follow path - barrel racing", followPathBR);
     m_DashboardAutoChooser.AddOption("follow path - slalom", followPathS);
+
+    m_DashboardAutoChooser.AddOption("pickup cells : challenge", pickupCellsChallenge);
 }
 
 void RobotContainer::ReportSelectedAuto () {

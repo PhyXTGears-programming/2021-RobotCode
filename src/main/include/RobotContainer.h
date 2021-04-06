@@ -13,6 +13,7 @@
 #include "subsystems/Intake.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/ControlPanel.h"
+#include "subsystems/Pixycam.h"
 #include "subsystems/PowerCellCounter.h"
 
 #include "commands/ExpelIntakeCommand.h"
@@ -86,6 +87,8 @@ class RobotContainer {
         ControlWinchCommand* m_ControlWinchCommand;
 
         SendableChooser2<frc2::Command *> m_DashboardAutoChooser;
+
+        Pixycam* m_Pixy;
 
         bool m_TurretManualControl = false; // Currently running manual control
         bool m_IntakeExtended = false;
