@@ -44,7 +44,10 @@ void FollowPolybezier::Initialize () {
     currentBezier = 0;
     ResetCurveProgress();
 
+    drivetrain->SetBrake(false);
+
     drivetrain->SetAcceleration(0, 0);
+    drivetrain->SetAngularVelocity(0);
     velocity = 0;
     acceleration = 0;
     lastTime = frc::RobotController::GetFPGATime();
@@ -91,6 +94,7 @@ void FollowPolybezier::Execute () {
     double angle = std::atan2(derivs.firstDeriv.y, derivs.firstDeriv.x);
 
     if (backwards) {
+        w *= -1;
         // shift angle by pi
         if (angle > 0) {
             angle -= PI;
@@ -107,7 +111,7 @@ void FollowPolybezier::Execute () {
         angle -= 2*PI;
     }
 
-    std::cout << frc::RobotController::GetFPGATime() << "," << angle << "," << robotAngle << std::endl;
+    // std::cout << frc::RobotController::GetFPGATime() << "," << angle << "," << robotAngle << std::endl;
 
     auto accel = CalculateAcceleration();
 
@@ -146,7 +150,8 @@ std::pair<double, double> FollowPolybezier::CalculateAcceleration () {
             cVertex = 0;
             cBezier++;
             if (cBezier >= polybezier.size()) {
-                if (-cVelocity < leastMargin.first) leastMargin = {-cVelocity, {cBezier-1, polybezier[cBezier].second.size()-1}};
+                double endMargin = -cVelocity; // add 0.2 for bounce
+                if (-cVelocity < leastMargin.first) leastMargin = {endMargin, {cBezier-1, polybezier[cBezier].second.size()-1}};
                 break;
             }
         }
