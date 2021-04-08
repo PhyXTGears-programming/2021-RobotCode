@@ -357,6 +357,7 @@ void RobotContainer::InitAutonomousChooser () {
 
     FollowPolybezier barrel_racing_follower {m_Drivetrain, "/home/lvuser/deploy/paths/autonav5.json", followerConfig};
     FollowPolybezier slalom_follower {m_Drivetrain, "/home/lvuser/deploy/paths/autonav-slalom-2.json", followerConfig};
+    FollowPolybezier test_follower {m_Drivetrain, "/home/lvuser/deploy/paths/testPath.json", followerConfig, true};
 
     frc2::SequentialCommandGroup* followPathBR = new frc2::SequentialCommandGroup(
         getResetPose(barrel_racing_follower.GetStartPoint()),
@@ -366,6 +367,11 @@ void RobotContainer::InitAutonomousChooser () {
     frc2::SequentialCommandGroup* followPathS = new frc2::SequentialCommandGroup(
         getResetPose(slalom_follower.GetStartPoint()),
         std::move(slalom_follower)
+    );
+
+    frc2::SequentialCommandGroup* followPathTest = new frc2::SequentialCommandGroup(
+        getResetPose(test_follower.GetStartPoint()),
+        std::move(test_follower)
     );
 
     PickupCellsCommand* pickupCellsChallenge = new PickupCellsCommand(
@@ -383,11 +389,11 @@ void RobotContainer::InitAutonomousChooser () {
     m_DashboardAutoChooser.AddOption("close auto", closeShotAutoCommand);
     m_DashboardAutoChooser.AddOption("follow path - barrel racing", followPathBR);
     m_DashboardAutoChooser.AddOption("follow path - slalom", followPathS);
+    m_DashboardAutoChooser.AddOption("follow path - test", followPathTest);
 
     m_DashboardAutoChooser.AddOption("pickup cells : challenge", pickupCellsChallenge);
     m_DashboardAutoChooser.AddOption("test pixycam detector", testPixycamDetector);
     m_DashboardAutoChooser.AddOption("test pixycam position", testPixycamPosition);
-
 }
 
 void RobotContainer::ReportSelectedAuto () {

@@ -8,8 +8,8 @@
 
 constexpr double PI = 3.1415926535897932;
 
-FollowPolybezier::FollowPolybezier (Drivetrain* drivetrain, const wpi::Twine &filename, Configuration configuration) :
-    drivetrain(drivetrain), config(configuration)
+FollowPolybezier::FollowPolybezier (Drivetrain* drivetrain, const wpi::Twine &filename, Configuration configuration, bool backwards) :
+    drivetrain(drivetrain), config(configuration), backwards(backwards)
 {
     AddRequirements(drivetrain);
 
@@ -90,6 +90,15 @@ void FollowPolybezier::Execute () {
     // get the current target angle using the tangent at the current point
     double angle = std::atan2(derivs.firstDeriv.y, derivs.firstDeriv.x);
 
+    if (backwards) {
+        // shift angle by pi
+        if (angle > 0) {
+            angle -= PI;
+        } else {
+            angle += PI; 
+        }
+    }
+
     // shift by 360 degrees if one of the values rolls over but the other doesn't
     double robotAngle = pose.Rotation().Radians().to<double>();
     if (robotAngle - angle > 4.5) {
@@ -102,7 +111,12 @@ void FollowPolybezier::Execute () {
 
     auto accel = CalculateAcceleration();
 
-    drivetrain->SetAcceleration(accel.first, accel.second);
+    if (backwards) {
+        drivetrain->SetAcceleration(-accel.first, -accel.second);
+    } else {
+        drivetrain->SetAcceleration(accel.first, accel.second);
+    }
+
     drivetrain->SetAngularVelocity(w, angle);
 
     lastPose = pose;

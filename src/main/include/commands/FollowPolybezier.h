@@ -18,7 +18,7 @@ class FollowPolybezier : public frc2::CommandHelper<frc2::CommandBase, FollowPol
             double maximumReverseAcceleration;
         };
 
-        FollowPolybezier(Drivetrain *drivetrain, const wpi::Twine &filename, Configuration configuration);
+        FollowPolybezier(Drivetrain *drivetrain, const wpi::Twine &filename, Configuration configuration, bool backwards = false);
 
         void Initialize();
         void Execute();
@@ -54,6 +54,7 @@ class FollowPolybezier : public frc2::CommandHelper<frc2::CommandBase, FollowPol
 
         Drivetrain *drivetrain;
         Configuration config;
+        bool backwards;
 
         bool finished;
 
