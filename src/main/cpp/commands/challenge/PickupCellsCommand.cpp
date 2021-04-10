@@ -172,11 +172,25 @@ static frc2::Command* build_pickup_command(
     const FollowPolybezier::Configuration &followerConfig,
     wpi::Twine path
 ) {
+    FollowPolybezier follower { drivetrain, path, followerConfig };
+    auto start = follower.GetStartPoint();
+
     return new frc2::SequentialCommandGroup(
-        frc2::InstantCommand([intake] { intake->IntakeExtend(); }, { intake }),
-        frc2::InstantCommand([intake] { intake->IntakeStart(); }, { intake }),
-        FollowPolybezier { drivetrain, path, followerConfig },
-        frc2::InstantCommand([intake] { intake->IntakeStop(); }, { intake }),
-        frc2::InstantCommand([intake] { intake->IntakeRetract(); }, { intake })
+        frc2::InstantCommand(
+            [intake, drivetrain, start] {
+                intake->IntakeExtend();
+                intake->IntakeStart();
+                drivetrain->SetPose(start.x, start.y, 0);
+            },
+            { intake }
+        ),
+        std::move(follower),
+        frc2::InstantCommand(
+            [intake] {
+                intake->IntakeStop();
+                intake->IntakeRetract();
+            },
+            { intake }
+        )
     );
 }
