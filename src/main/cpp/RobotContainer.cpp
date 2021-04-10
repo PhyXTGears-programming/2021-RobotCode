@@ -17,6 +17,8 @@
 #include <frc2/command/StartEndCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
 
+#include "Units.h"
+
 #include "commands/AimCommand.h"
 #include "commands/AimShootCommand.h"
 #include "commands/SimpleDriveCommand.h"
@@ -49,10 +51,19 @@ RobotContainer::RobotContainer () {
 
     m_Pixy = new Pixycam();
 
-    auto nearSpeed = units::angular_velocity::revolutions_per_minute_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.near").value_or(4400.0)
+    auto nearSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.near").value_or(2500.0)
     };
-    auto farSpeed = units::angular_velocity::revolutions_per_minute_t{
+
+    auto nearMidSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.nearMid").value_or(2890)
+    };
+
+    auto farMidSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.farMid").value_or(3500)
+    };
+
+    auto farSpeed = rpm_t{
         toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.far").value_or(4100.0)
     };
 
@@ -64,6 +75,11 @@ RobotContainer::RobotContainer () {
     m_TeleopShootCommand        = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
     m_TeleopSlowShootCommand    = new ShootCommand(m_Shooter, m_Intake, farSpeed);
     m_ReverseBrushesCommand     = new ReverseBrushesCommand(m_Intake);
+
+    m_ChallengeNearShootCommand     = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
+    m_ChallengeNearMidShootCommand  = new ShootCommand(m_Shooter, m_Intake, nearMidSpeed);
+    m_ChallengeFarMidShootCommand   = new ShootCommand(m_Shooter, m_Intake, farMidSpeed);
+    m_ChallengeFarShootCommand      = new ShootCommand(m_Shooter, m_Intake, farSpeed);
 
     m_ControlWinchCommand   = new ControlWinchCommand(m_Climb, [=] { return m_ClimbJoystick.GetY(JoystickHand::kLeftHand); });
     m_RetractClimbCommand   = new RetractClimbCommand(m_Climb);
@@ -146,9 +162,9 @@ void RobotContainer::PollInput () {
     // ####################
 
     // Camera Aiming (X)
-    if (m_OperatorJoystick.GetXButtonPressed() || m_OperatorJoystick.GetYButtonPressed()) {
+    if (m_OperatorJoystick.GetXButtonPressed() || m_OperatorJoystick.GetYButtonPressed() || m_DriverJoystick.GetXButtonPressed()) {
         m_Shooter->SetTrackingMode(TrackingMode::CameraTracking);
-    } else if (m_OperatorJoystick.GetXButtonReleased() || m_OperatorJoystick.GetYButtonReleased()) {
+    } else if (m_OperatorJoystick.GetXButtonReleased() || m_OperatorJoystick.GetYButtonReleased() || m_DriverJoystick.GetXButtonReleased()) {
         m_Shooter->SetTrackingMode(TrackingMode::Off);
     }
 
@@ -186,17 +202,54 @@ void RobotContainer::PollInput () {
     }
 
     // Expel Intake (DP Left)
-    if (POV_LEFT == m_OperatorJoystick.GetPOV() && !m_ExpelIntakeCommand->IsScheduled()) {
-        m_ExpelIntakeCommand->Schedule();
-    } else if (POV_LEFT != m_OperatorJoystick.GetPOV() && m_ExpelIntakeCommand->IsScheduled()) {
-        m_ExpelIntakeCommand->Cancel();
-    }
+    // if (POV_LEFT == m_OperatorJoystick.GetPOV() && !m_ExpelIntakeCommand->IsScheduled()) {
+    //     m_ExpelIntakeCommand->Schedule();
+    // } else if (POV_LEFT != m_OperatorJoystick.GetPOV() && m_ExpelIntakeCommand->IsScheduled()) {
+    //     m_ExpelIntakeCommand->Cancel();
+    // }
 
     // Reverse Brushes (DP Right)
-    if (POV_RIGHT == m_OperatorJoystick.GetPOV() && !m_ReverseBrushesCommand->IsScheduled()) {
-        m_ReverseBrushesCommand->Schedule();
-    } else if (POV_RIGHT != m_OperatorJoystick.GetPOV() && m_ReverseBrushesCommand->IsScheduled()) {
-        m_ReverseBrushesCommand->Cancel();
+    // if (POV_RIGHT == m_OperatorJoystick.GetPOV() && !m_ReverseBrushesCommand->IsScheduled()) {
+    //     m_ReverseBrushesCommand->Schedule();
+    // } else if (POV_RIGHT != m_OperatorJoystick.GetPOV() && m_ReverseBrushesCommand->IsScheduled()) {
+    //     m_ReverseBrushesCommand->Cancel();
+    // }
+
+    switch (m_OperatorJoystick.GetPOV()) {
+        case POV_LEFT:
+            if (!m_ChallengeNearShootCommand->IsScheduled()) {
+                m_ChallengeNearShootCommand->Schedule();
+            }
+            break;
+
+        case POV_RIGHT:
+            if (!m_ChallengeFarShootCommand->IsScheduled()) {
+                m_ChallengeFarShootCommand->Schedule();
+            }
+            break;
+
+        case POV_UP:
+            if (!m_ChallengeNearMidShootCommand->IsScheduled()) {
+                m_ChallengeNearMidShootCommand->Schedule();
+            }
+            break;
+
+        case POV_DOWN:
+            if (!m_ChallengeFarMidShootCommand->IsScheduled()) {
+                m_ChallengeFarMidShootCommand->Schedule();
+            }
+            break;
+
+        default:
+            if (m_ChallengeFarMidShootCommand->IsScheduled()) {
+                m_ChallengeFarMidShootCommand->Cancel();
+            } else if (m_ChallengeFarShootCommand->IsScheduled()) {
+                m_ChallengeFarShootCommand->Cancel();
+            } else if (m_ChallengeNearMidShootCommand->IsScheduled()) {
+                m_ChallengeNearMidShootCommand->Cancel();
+            } else if (m_ChallengeNearShootCommand->IsScheduled()) {
+                m_ChallengeNearShootCommand->Cancel();
+            }
     }
 
     // ####################
@@ -261,6 +314,8 @@ std::shared_ptr<cpptoml::table> RobotContainer::LoadConfig (std::string path) {
 }
 
 void RobotContainer::InitAutonomousChooser () {
+    const rpm_t kShooterSpeed = 4500_rpm;
+
     frc2::SequentialCommandGroup* threeCellAutoCommand = new frc2::SequentialCommandGroup(
         frc2::StartEndCommand {
             [=]() { m_Shooter->SetTurretSpeed(0.8); },
@@ -268,7 +323,7 @@ void RobotContainer::InitAutonomousChooser () {
             m_Shooter
         }.WithTimeout(0.5_s),
         AimCommand{m_Shooter}.WithTimeout(2.0_s),
-        AimShootCommand{m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(3.5_s),
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(3.5_s),
         SimpleDriveCommand{0.25, 0.0, m_Drivetrain}.WithTimeout(1.0_s)
     );
 
@@ -312,11 +367,11 @@ void RobotContainer::InitAutonomousChooser () {
         PreheatShooterCommand{m_Shooter},
         AutonomousRotateTurretCommand{m_Shooter}.WithTimeout(0.3_s),
         AimCommand{m_Shooter}.WithTimeout(1.0_s),
-        AimShootCommand{m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s),
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s),
         std::move(driveThruTrench),
         PreheatShooterCommand{m_Shooter},
         AimCommand{m_Shooter}.WithTimeout(0.5_s),
-        AimShootCommand{m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s),
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s),
         // RetractIntakeCommand{m_Intake},
         frc2::InstantCommand{
             [=] {
@@ -356,7 +411,7 @@ void RobotContainer::InitAutonomousChooser () {
     };
 
     FollowPolybezier barrel_racing_follower {m_Drivetrain, "/home/lvuser/deploy/paths/autonav6.json", followerConfig};
-    FollowPolybezier slalom_follower {m_Drivetrain, "/home/lvuser/deploy/paths/autonav-slalom-3.json", followerConfig};
+    FollowPolybezier slalom_follower {m_Drivetrain, "/home/lvuser/deploy/paths/autonav-slalom-4.json", followerConfig};
     FollowPolybezier test_follower {m_Drivetrain, "/home/lvuser/deploy/paths/testPath.json", followerConfig, true};
 
     FollowPolybezier bounce_follower_a {m_Drivetrain, "/home/lvuser/deploy/paths/bounce-a.json", followerConfig};

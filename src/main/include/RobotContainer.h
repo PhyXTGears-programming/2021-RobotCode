@@ -75,6 +75,11 @@ class RobotContainer {
         ShootCommand* m_TeleopSlowShootCommand;
         ReverseBrushesCommand* m_ReverseBrushesCommand;
 
+        ShootCommand* m_ChallengeNearShootCommand;
+        ShootCommand* m_ChallengeNearMidShootCommand;
+        ShootCommand* m_ChallengeFarMidShootCommand;
+        ShootCommand* m_ChallengeFarShootCommand;
+
         RetractClimbCommand* m_RetractClimbCommand;
         ExtendClimbCommand* m_ExtendClimbCommand;
         RollClimbLeftCommand* m_RollClimbLeftCommand;

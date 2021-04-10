@@ -13,8 +13,10 @@ shooterVelocity.i = 0.0
 shooterVelocity.d = 0.01
 shooterVelocity.f = 0.0002
 
-shootingSpeed.near = 3000
-shootingSpeed.far  = 2840
+shootingSpeed.near = 2700
+shootingSpeed.nearMid = 2890
+shootingSpeed.farMid = 3200
+shootingSpeed.far  = 4200
 
 [intake]
 speed.load  = 0.725

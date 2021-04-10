@@ -49,12 +49,15 @@ void Drivetrain::Periodic () {
 
     if (frc::RobotController::IsSysActive() && !brakeOn && !oldDriving) {
         UpdateVoltages();
+    } else if (!brakeOn && !oldDriving) {
+        SetBrake(true);
     }
 }
 
 // Calculate radius from x stick, and drive
 void Drivetrain::Drive (double yInput, double xInput) {
     // Radius math in Desmos (https://www.desmos.com/calculator/htvtwcp39g)
+    xInput = std::copysign(std::sqrt(std::fabs(xInput)), xInput);
     double r = 1/(kTurnInputConstant * xInput) - xInput/kTurnInputConstant;
 
     // When the radius is 0, RadiusDrive turns the robot clockwise by default
