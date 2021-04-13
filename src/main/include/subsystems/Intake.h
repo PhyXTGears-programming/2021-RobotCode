@@ -48,7 +48,7 @@ class Intake : public frc2::SubsystemBase {
         frc::DigitalInput m_FeederPowerCellDetector {kBeamPowerCellFeeder};
 
         bool m_IsExtended = false;
-        
+
         struct {
             struct {
                 double load, shoot;

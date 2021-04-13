@@ -1,5 +1,7 @@
 #pragma once
 
+#include <frc/SPI.h>
+
 namespace ConfigFiles {
     const std::string ConfigFile     = "config.toml";
     const std::string AutoConfigFile = "auto.toml";
@@ -85,8 +87,8 @@ constexpr int kIntakeMotor    = Pins::CAN_7;
 constexpr int kConveyorMotor  = Pins::CAN_8;
 
 // PCM pin for intake solenoid
-constexpr int kIntakeExtendSolenoidPin  = Pins::AIR_2;
-constexpr int kIntakeRetractSolenoidPin = Pins::AIR_6;
+constexpr int kIntakeExtendSolenoidPin  = Pins::AIR_6;
+constexpr int kIntakeRetractSolenoidPin = Pins::AIR_2;
 
 constexpr int kBeamPowerCellFeeder = Pins::DIO_2;
 
@@ -125,3 +127,6 @@ namespace ControlPanelPins {
 
 // PCM 2
 constexpr int kPCM2 = Pins::CAN_15;
+
+// PixyCam
+constexpr frc::SPI::Port kPixycamSpi = frc::SPI::kOnboardCS0;

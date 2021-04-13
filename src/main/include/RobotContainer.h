@@ -13,9 +13,9 @@
 #include "subsystems/Intake.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/ControlPanel.h"
+#include "subsystems/Pixycam.h"
 #include "subsystems/PowerCellCounter.h"
 
-#include "commands/AutonomousCommand.h"
 #include "commands/ExpelIntakeCommand.h"
 #include "commands/ExtendIntakeCommand.h"
 #include "commands/IntakeBallsCommand.h"
@@ -66,7 +66,6 @@ class RobotContainer {
         ControlPanel* m_ControlPanel;
         PowerCellCounter* m_PowerCellCounter;
 
-        AutonomousCommand* m_AutonomousCommand;
         IntakeBallsCommand* m_IntakeBallsCommand;
         ExpelIntakeCommand* m_ExpelIntakeCommand;
         RetractIntakeCommand* m_RetractIntakeCommand;
@@ -75,6 +74,11 @@ class RobotContainer {
         ShootCommand* m_TeleopShootCommand;
         ShootCommand* m_TeleopSlowShootCommand;
         ReverseBrushesCommand* m_ReverseBrushesCommand;
+
+        ShootCommand* m_ChallengeNearShootCommand;
+        ShootCommand* m_ChallengeNearMidShootCommand;
+        ShootCommand* m_ChallengeFarMidShootCommand;
+        ShootCommand* m_ChallengeFarShootCommand;
 
         RetractClimbCommand* m_RetractClimbCommand;
         ExtendClimbCommand* m_ExtendClimbCommand;
@@ -88,6 +92,8 @@ class RobotContainer {
         ControlWinchCommand* m_ControlWinchCommand;
 
         SendableChooser2<frc2::Command *> m_DashboardAutoChooser;
+
+        Pixycam* m_Pixy;
 
         bool m_TurretManualControl = false; // Currently running manual control
         bool m_IntakeExtended = false;

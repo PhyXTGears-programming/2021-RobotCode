@@ -4,7 +4,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-ShootCommand::ShootCommand (Shooter* shooter, Intake* intake, units::angular_velocity::revolutions_per_minute_t speed) {
+ShootCommand::ShootCommand (Shooter* shooter, Intake* intake, rpm_t speed) {
     AddRequirements(shooter);
     AddRequirements(intake);
 
