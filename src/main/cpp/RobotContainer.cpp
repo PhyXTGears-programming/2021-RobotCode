@@ -202,54 +202,17 @@ void RobotContainer::PollInput () {
     }
 
     // Expel Intake (DP Left)
-    // if (POV_LEFT == m_OperatorJoystick.GetPOV() && !m_ExpelIntakeCommand->IsScheduled()) {
-    //     m_ExpelIntakeCommand->Schedule();
-    // } else if (POV_LEFT != m_OperatorJoystick.GetPOV() && m_ExpelIntakeCommand->IsScheduled()) {
-    //     m_ExpelIntakeCommand->Cancel();
-    // }
+    if (POV_LEFT == m_OperatorJoystick.GetPOV() && !m_ExpelIntakeCommand->IsScheduled()) {
+        m_ExpelIntakeCommand->Schedule();
+    } else if (POV_LEFT != m_OperatorJoystick.GetPOV() && m_ExpelIntakeCommand->IsScheduled()) {
+        m_ExpelIntakeCommand->Cancel();
+    }
 
     // Reverse Brushes (DP Right)
-    // if (POV_RIGHT == m_OperatorJoystick.GetPOV() && !m_ReverseBrushesCommand->IsScheduled()) {
-    //     m_ReverseBrushesCommand->Schedule();
-    // } else if (POV_RIGHT != m_OperatorJoystick.GetPOV() && m_ReverseBrushesCommand->IsScheduled()) {
-    //     m_ReverseBrushesCommand->Cancel();
-    // }
-
-    switch (m_OperatorJoystick.GetPOV()) {
-        case POV_LEFT:
-            if (!m_ChallengeNearShootCommand->IsScheduled()) {
-                m_ChallengeNearShootCommand->Schedule();
-            }
-            break;
-
-        case POV_RIGHT:
-            if (!m_ChallengeFarShootCommand->IsScheduled()) {
-                m_ChallengeFarShootCommand->Schedule();
-            }
-            break;
-
-        case POV_UP:
-            if (!m_ChallengeNearMidShootCommand->IsScheduled()) {
-                m_ChallengeNearMidShootCommand->Schedule();
-            }
-            break;
-
-        case POV_DOWN:
-            if (!m_ChallengeFarMidShootCommand->IsScheduled()) {
-                m_ChallengeFarMidShootCommand->Schedule();
-            }
-            break;
-
-        default:
-            if (m_ChallengeFarMidShootCommand->IsScheduled()) {
-                m_ChallengeFarMidShootCommand->Cancel();
-            } else if (m_ChallengeFarShootCommand->IsScheduled()) {
-                m_ChallengeFarShootCommand->Cancel();
-            } else if (m_ChallengeNearMidShootCommand->IsScheduled()) {
-                m_ChallengeNearMidShootCommand->Cancel();
-            } else if (m_ChallengeNearShootCommand->IsScheduled()) {
-                m_ChallengeNearShootCommand->Cancel();
-            }
+    if (POV_RIGHT == m_OperatorJoystick.GetPOV() && !m_ReverseBrushesCommand->IsScheduled()) {
+        m_ReverseBrushesCommand->Schedule();
+    } else if (POV_RIGHT != m_OperatorJoystick.GetPOV() && m_ReverseBrushesCommand->IsScheduled()) {
+        m_ReverseBrushesCommand->Cancel();
     }
 
     // ####################
