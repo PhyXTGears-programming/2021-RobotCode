@@ -75,8 +75,8 @@ Shooter::Shooter (std::shared_ptr<cpptoml::table> toml) {
 void Shooter::Periodic () {
     // double factor = 1 / kShooterGearRatio;
 
-    // frc::SmartDashboard::PutNumber("Shooter Motor 1", m_ShooterMotor1.GetEncoder().GetVelocity() * factor);
-    // frc::SmartDashboard::PutNumber("Shooter Motor 2", m_ShooterMotor2.GetEncoder().GetVelocity() * factor);
+    frc::SmartDashboard::PutNumber("Shooter Motor 1", MeasureShooterMotorSpeed1());
+    frc::SmartDashboard::PutNumber("Shooter Motor 2", MeasureShooterMotorSpeed2());
     
     // frc::SmartDashboard::PutNumber("Turret Speed Read (RPM)", units::unit_cast<double>(m_TurretMotor.GetSelectedSensorVelocity() / kTurretGearRatio / kMotorRPMtoEncoderVelocity));
 
@@ -102,7 +102,7 @@ void Shooter::SetShooterMotorSpeed (units::angular_velocity::revolutions_per_min
 }
 
 units::angular_velocity::revolutions_per_minute_t Shooter::GetShooterMotorSpeed () {
-    return units::angular_velocity::revolutions_per_minute_t(m_ShooterMotor1.GetEncoder().GetVelocity() / kShooterGearRatio);
+    return units::angular_velocity::revolutions_per_minute_t(MeasureShooterMotorSpeed1());
 }
 
 void Shooter::SetTrackingMode (TrackingMode mode) {
@@ -159,11 +159,11 @@ bool Shooter::IsOnTarget () {
 }
 
 double Shooter::MeasureShooterMotorSpeed1 () {
-    return m_ShooterMotor1.GetEncoder().GetVelocity() / kShooterGearRatio;
+    return m_ShooterMotor1.GetEncoder().GetVelocity() / kShooterGearRatio * (1500.0 / 2700.0);
 }
 
 double Shooter::MeasureShooterMotorSpeed2 () {
-    return m_ShooterMotor2.GetEncoder().GetVelocity() / kShooterGearRatio;
+    return m_ShooterMotor2.GetEncoder().GetVelocity() / kShooterGearRatio * (1500.0 / 2700.0);
 }
 
 void Shooter::SetLimelightLight (bool on) {
