@@ -12,6 +12,7 @@
 #define SetPIDFSlot(motor, P, I, D, F, slot) motor.SetP(P, slot); motor.SetI(I, slot); motor.SetD(D, slot); motor.SetFF(F, slot)
 
 #define kShooterGearRatio (18.0 / 24.0)
+#define kShooterCorrectionFactor (2700.0 / 1500.0) // 2700 rpm encoder / 1500 rpm tachometer
 
 #define kTurretGearRatio (20.0 / 3.0)
 #define kMotorRPMtoEncoderVelocity (4096 / (600_rpm)) // encoder velocity is measured in ticks per 100 ms
@@ -44,7 +45,15 @@ Shooter::Shooter (std::shared_ptr<cpptoml::table> toml) {
     m_ShooterMotor2.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 
     m_ShooterMotor1.SetInverted(false);
-    m_ShooterMotor2.SetInverted(true);
+    m_ShooterMotor2.Follow(m_ShooterMotor1, true);
+
+    std::cout
+        << "velocity conversion factor| motor 1: "
+        << m_ShooterMotor1.GetEncoder().GetVelocityConversionFactor()
+        << "\t"
+        << "motor 2: "
+        << m_ShooterMotor2.GetEncoder().GetVelocityConversionFactor()
+        << std::endl;
 
     // Setup vision NT
     m_VisionTable = nt::NetworkTableInstance::GetDefault().GetTable("limelight-gears");
@@ -92,12 +101,10 @@ void Shooter::Periodic () {
 
 void Shooter::SetShooterMotorSpeed (units::angular_velocity::revolutions_per_minute_t speed) {
     if (units::math::fabs(speed) > 50_rpm) {
-        double motorSpeed = kShooterGearRatio * units::unit_cast<double>(speed);
+        double motorSpeed = kShooterGearRatio * kShooterCorrectionFactor * units::unit_cast<double>(speed);
         m_ShooterMotor1.GetPIDController().SetReference(motorSpeed, rev::kVelocity);
-        m_ShooterMotor2.GetPIDController().SetReference(motorSpeed, rev::kVelocity);
     } else {
         m_ShooterMotor1.Set(0);
-        m_ShooterMotor2.Set(0);
     }
 }
 
@@ -159,11 +166,11 @@ bool Shooter::IsOnTarget () {
 }
 
 double Shooter::MeasureShooterMotorSpeed1 () {
-    return m_ShooterMotor1.GetEncoder().GetVelocity() / kShooterGearRatio * (1500.0 / 2700.0);
+    return m_ShooterMotor1.GetEncoder().GetVelocity() / kShooterGearRatio / kShooterCorrectionFactor;
 }
 
 double Shooter::MeasureShooterMotorSpeed2 () {
-    return m_ShooterMotor2.GetEncoder().GetVelocity() / kShooterGearRatio * (1500.0 / 2700.0);
+    return m_ShooterMotor2.GetEncoder().GetVelocity() / kShooterGearRatio / kShooterCorrectionFactor;
 }
 
 void Shooter::SetLimelightLight (bool on) {
