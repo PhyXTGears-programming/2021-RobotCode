@@ -112,7 +112,7 @@ namespace ClimbPins {
     constexpr int kBrakeLockSolenoid    = Pins::AIR_4;
     constexpr int kBrakeUnlockSolenoid  = Pins::AIR_3;
 
-    constexpr int kClimbRollerRelay = Pins::RELAY_0;
+    constexpr int kClimbRollerMotor = Pins::CAN_17;
 }
 
 // Control Panel

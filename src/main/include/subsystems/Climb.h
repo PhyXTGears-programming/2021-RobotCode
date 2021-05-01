@@ -5,6 +5,7 @@
 #include <frc/Relay.h>
 #include <frc/Solenoid.h>
 #include <frc/Relay.h>
+#include <rev/CANSparkMax.h>
 
 #include "Constants.h"
 
@@ -59,6 +60,6 @@ class Climb : public frc2::SubsystemBase {
         frc::Solenoid m_BrakeLockSolenoid {ClimbPins::kBrakeLockSolenoid};
         frc::Solenoid m_BrakeUnlockSolenoid {ClimbPins::kBrakeUnlockSolenoid};
 
-        frc::Relay m_ClimbRoller {ClimbPins::kClimbRollerRelay};
+        rev::CANSparkMax m_ClimbRoller {ClimbPins::kClimbRollerMotor, rev::CANSparkMax::MotorType::kBrushless};
 };
 

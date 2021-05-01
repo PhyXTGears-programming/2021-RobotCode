@@ -73,15 +73,15 @@ void Climb::WinchUnlock () {
 }
 
 void Climb::RollLeft () {
-    m_ClimbRoller.Set(frc::Relay::Value::kForward);
+    m_ClimbRoller.Set(-1.0);
 }
 
 void Climb::RollRight () {
-    m_ClimbRoller.Set(frc::Relay::Value::kReverse);
+    m_ClimbRoller.Set(1.0);
 }
 
 void Climb::RollStop () {
-    m_ClimbRoller.Set(frc::Relay::Value::kOff);
+    m_ClimbRoller.Set(0.0);
 }
 
 void Climb::SetWinchSpeed (double speed) {
