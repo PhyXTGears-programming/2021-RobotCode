@@ -111,7 +111,7 @@ void Shooter::SetTrackingMode (TrackingMode mode) {
     if (mode == TrackingMode::Off) {
         SetTurretSpeed(0_rpm);
     }
-    
+
     if (mode == TrackingMode::CameraTracking) {
         SetLimelightLight(true);
     } else {

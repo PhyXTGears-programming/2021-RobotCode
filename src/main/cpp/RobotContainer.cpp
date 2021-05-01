@@ -51,20 +51,12 @@ RobotContainer::RobotContainer () {
 
     m_Pixy = new Pixycam();
 
-    auto nearSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.near").value_or(2500.0)
+    auto aSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.a").value_or(2500.0)
     };
 
-    auto nearMidSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.nearMid").value_or(2890)
-    };
-
-    auto farMidSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.farMid").value_or(3500)
-    };
-
-    auto farSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.far").value_or(4100.0)
+    auto bSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.b").value_or(2890)
     };
 
     m_IntakeBallsCommand        = new IntakeBallsCommand(m_Intake, m_PowerCellCounter);
@@ -72,14 +64,14 @@ RobotContainer::RobotContainer () {
     m_RetractIntakeCommand      = new RetractIntakeCommand(m_Intake);
     m_ExtendIntakeCommand       = new ExtendIntakeCommand(m_Intake);
     m_TeleopDriveCommand        = new TeleopDriveCommand(m_Drivetrain, &m_DriverJoystick);
-    m_TeleopShootCommand        = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
-    m_TeleopSlowShootCommand    = new ShootCommand(m_Shooter, m_Intake, farSpeed);
+    m_TeleopShootCommand        = new ShootCommand(m_Shooter, m_Intake, aSpeed);
+    m_TeleopSlowShootCommand    = new ShootCommand(m_Shooter, m_Intake, bSpeed);
     m_ReverseBrushesCommand     = new ReverseBrushesCommand(m_Intake);
 
-    m_ChallengeNearShootCommand     = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
-    m_ChallengeNearMidShootCommand  = new ShootCommand(m_Shooter, m_Intake, nearMidSpeed);
-    m_ChallengeFarMidShootCommand   = new ShootCommand(m_Shooter, m_Intake, farMidSpeed);
-    m_ChallengeFarShootCommand      = new ShootCommand(m_Shooter, m_Intake, farSpeed);
+    // m_ChallengeNearShootCommand     = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
+    // m_ChallengeNearMidShootCommand  = new ShootCommand(m_Shooter, m_Intake, nearMidSpeed);
+    // m_ChallengeFarMidShootCommand   = new ShootCommand(m_Shooter, m_Intake, farMidSpeed);
+    // m_ChallengeFarShootCommand      = new ShootCommand(m_Shooter, m_Intake, farSpeed);
 
     m_ControlWinchCommand   = new ControlWinchCommand(m_Climb, [=] { return m_ClimbJoystick.GetY(JoystickHand::kLeftHand); });
     m_RetractClimbCommand   = new RetractClimbCommand(m_Climb);
@@ -215,42 +207,43 @@ void RobotContainer::PollInput () {
     //     m_ReverseBrushesCommand->Cancel();
     // }
 
-    switch (m_OperatorJoystick.GetPOV()) {
-        case POV_LEFT:
-            if (!m_ChallengeNearShootCommand->IsScheduled()) {
-                m_ChallengeNearShootCommand->Schedule();
-            }
-            break;
+    // Multiple shooting speeds
+    // switch (m_OperatorJoystick.GetPOV()) {
+    //     case POV_LEFT:
+    //         if (!m_ChallengeNearShootCommand->IsScheduled()) {
+    //             m_ChallengeNearShootCommand->Schedule();
+    //         }
+    //         break;
 
-        case POV_RIGHT:
-            if (!m_ChallengeFarShootCommand->IsScheduled()) {
-                m_ChallengeFarShootCommand->Schedule();
-            }
-            break;
+    //     case POV_RIGHT:
+    //         if (!m_ChallengeFarShootCommand->IsScheduled()) {
+    //             m_ChallengeFarShootCommand->Schedule();
+    //         }
+    //         break;
 
-        case POV_UP:
-            if (!m_ChallengeNearMidShootCommand->IsScheduled()) {
-                m_ChallengeNearMidShootCommand->Schedule();
-            }
-            break;
+    //     case POV_UP:
+    //         if (!m_ChallengeNearMidShootCommand->IsScheduled()) {
+    //             m_ChallengeNearMidShootCommand->Schedule();
+    //         }
+    //         break;
 
-        case POV_DOWN:
-            if (!m_ChallengeFarMidShootCommand->IsScheduled()) {
-                m_ChallengeFarMidShootCommand->Schedule();
-            }
-            break;
+    //     case POV_DOWN:
+    //         if (!m_ChallengeFarMidShootCommand->IsScheduled()) {
+    //             m_ChallengeFarMidShootCommand->Schedule();
+    //         }
+    //         break;
 
-        default:
-            if (m_ChallengeFarMidShootCommand->IsScheduled()) {
-                m_ChallengeFarMidShootCommand->Cancel();
-            } else if (m_ChallengeFarShootCommand->IsScheduled()) {
-                m_ChallengeFarShootCommand->Cancel();
-            } else if (m_ChallengeNearMidShootCommand->IsScheduled()) {
-                m_ChallengeNearMidShootCommand->Cancel();
-            } else if (m_ChallengeNearShootCommand->IsScheduled()) {
-                m_ChallengeNearShootCommand->Cancel();
-            }
-    }
+    //     default:
+    //         if (m_ChallengeFarMidShootCommand->IsScheduled()) {
+    //             m_ChallengeFarMidShootCommand->Cancel();
+    //         } else if (m_ChallengeFarShootCommand->IsScheduled()) {
+    //             m_ChallengeFarShootCommand->Cancel();
+    //         } else if (m_ChallengeNearMidShootCommand->IsScheduled()) {
+    //             m_ChallengeNearMidShootCommand->Cancel();
+    //         } else if (m_ChallengeNearShootCommand->IsScheduled()) {
+    //             m_ChallengeNearShootCommand->Cancel();
+    //         }
+    // }
 
     // ####################
     // #####  Climb   #####
@@ -449,11 +442,50 @@ void RobotContainer::InitAutonomousChooser () {
         followerConfig
     );
 
+    frc2::SequentialCommandGroup driveThroughTrenchFar {
+        // Drive through trench picking up power cells
+        frc2::ParallelCommandGroup{
+            frc2::SequentialCommandGroup{
+                SimpleDriveCommand{0.55, 0.0, m_Drivetrain}.WithTimeout(2.1_s),
+                SimpleDriveCommand{0.4, 0.0, m_Drivetrain}.WithTimeout(0.3_s),
+                SimpleDriveCommand{0.2, 0.0, m_Drivetrain}.WithTimeout(0.3_s)
+            },
+            IntakeBallsCommand{m_Intake, m_PowerCellCounter}.WithTimeout(2.5_s)
+        },
+        // // Reverse back to line
+        // frc2::ParallelRaceGroup{
+        //     SimpleDriveCommand{-0.6, 0.0, m_Drivetrain}.WithTimeout(1.6_s),
+        //     IntakeBallsCommand{m_Intake, m_PowerCellCounter}
+        // },
+        // // Decelerate
+        // SimpleDriveCommand{-0.4, 0.0, m_Drivetrain}.WithTimeout(0.3_s),
+        // SimpleDriveCommand{-0.2, 0.0, m_Drivetrain}.WithTimeout(0.4_s)
+    };
+
+    frc2::SequentialCommandGroup* eightCellAutoCommand = new frc2::SequentialCommandGroup(
+        frc2::InstantCommand{
+            [=]() {
+                startTime = hal::fpga_clock::now();
+                m_Shooter->SetLimelightLight(true);
+            }
+        },
+        ExtendIntakeCommand{m_Intake},
+        PreheatShooterCommand{m_Shooter},
+        AutonomousRotateTurretCommand{m_Shooter}.WithTimeout(0.3_s),
+        AimCommand{m_Shooter}.WithTimeout(1.0_s),
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s),
+        std::move(driveThroughTrenchFar),
+        PreheatShooterCommand{m_Shooter},
+        AimCommand{m_Shooter}.WithTimeout(0.5_s),
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s)
+    );
+
     TestPixycamDetectorCommand* testPixycamDetector = new TestPixycamDetectorCommand(m_Pixy);
     TestPixycamPositionCommand* testPixycamPosition = new TestPixycamPositionCommand(m_Pixy);
 
     m_DashboardAutoChooser.SetDefaultOption("3 cell auto", threeCellAutoCommand);
     m_DashboardAutoChooser.AddOption("6 cell auto", sixCellAutoCommand);
+    m_DashboardAutoChooser.AddOption("8 cell auto", eightCellAutoCommand);
     m_DashboardAutoChooser.AddOption("close auto", closeShotAutoCommand);
     m_DashboardAutoChooser.AddOption("follow path - barrel racing", followPathBR);
     m_DashboardAutoChooser.AddOption("follow path - slalom", followPathS);

@@ -83,7 +83,7 @@ void Robot::ProfileShooterPID () {
 
     static bool needsInit = true;
     static auto startTime = now;
-    if (IsAutonomous() && IsEnabled()) {
+    if (IsEnabled()) { // && IsAutonomous()
         if (needsInit) {
             needsInit = false;
             startTime = now;
