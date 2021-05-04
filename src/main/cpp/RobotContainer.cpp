@@ -182,9 +182,10 @@ void RobotContainer::PollInput () {
         m_ControlPanel->SetSpeed(operatorLeftX);
     } else {
         // Manual Aiming
-        if (std::abs(operatorLeftX) > 0.1) {
+        if (std::fabs(operatorLeftX) > 0.15) {
+            operatorLeftX = std::copysign(std::sqrt(std::fabs(operatorLeftX)), operatorLeftX);
             m_Shooter->SetTrackingMode(TrackingMode::Off);
-            m_Shooter->SetTurretSpeed(operatorLeftX * 25_rpm);
+            m_Shooter->SetTurretSpeed(operatorLeftX * 15_rpm);
             m_TurretManualControl = true;
         } else if (m_TurretManualControl) {
             m_Shooter->SetTurretSpeed(0_rpm);
