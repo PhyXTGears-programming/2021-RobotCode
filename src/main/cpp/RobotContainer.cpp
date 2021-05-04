@@ -165,6 +165,7 @@ void RobotContainer::PollInput () {
     if (m_OperatorJoystick.GetXButtonPressed() || m_OperatorJoystick.GetYButtonPressed() || m_DriverJoystick.GetXButtonPressed()) {
         m_Shooter->SetTrackingMode(TrackingMode::CameraTracking);
     } else if (m_OperatorJoystick.GetXButtonReleased() || m_OperatorJoystick.GetYButtonReleased() || m_DriverJoystick.GetXButtonReleased()) {
+        m_Shooter->ResetTurretPID();
         m_Shooter->SetTrackingMode(TrackingMode::Off);
     }
 

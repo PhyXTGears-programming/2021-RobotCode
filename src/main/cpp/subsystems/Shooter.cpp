@@ -147,6 +147,10 @@ void Shooter::SetTurretSpeed (double percentSpeed) {
     SetTurretSpeed(percentSpeed * kMaxTurretVelocity);
 }
 
+void Shooter::ResetTurretPID() {
+    m_TurretPID->Reset();
+}
+
 units::angular_velocity::revolutions_per_minute_t Shooter::GetShooterSpeedForDistance () {
     auto const lo = -13.9;
     auto const hi = 3.2;
