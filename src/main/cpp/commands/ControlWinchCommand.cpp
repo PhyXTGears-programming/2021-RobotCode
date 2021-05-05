@@ -12,11 +12,13 @@ void ControlWinchCommand::Initialize () {}
 void ControlWinchCommand::Execute () {
     double rightStickY = m_SpeedCheck();
 
-    if (!m_Climb->IsWinchLocked() && std::abs(rightStickY) > 0.25) {
+    double speed = std::sqrt(std::fabs(rightStickY));
+
+    if (!m_Climb->IsWinchLocked() && std::abs(rightStickY) > 0.15) {
         if (rightStickY > 0) {
-            m_Climb->WinchCableIn(rightStickY);
+            m_Climb->WinchCableIn(speed);
         } else if (rightStickY < 0) {
-            m_Climb->WinchCableOut(-rightStickY);
+            m_Climb->WinchCableOut(speed);
         } else {
             m_Climb->WinchStop();
         }
