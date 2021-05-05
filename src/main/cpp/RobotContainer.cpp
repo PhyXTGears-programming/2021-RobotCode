@@ -51,20 +51,12 @@ RobotContainer::RobotContainer () {
 
     m_Pixy = new Pixycam();
 
-    auto nearSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.near").value_or(2500.0)
+    auto aSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.a").value_or(2500.0)
     };
 
-    auto nearMidSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.nearMid").value_or(2890)
-    };
-
-    auto farMidSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.farMid").value_or(3500)
-    };
-
-    auto farSpeed = rpm_t{
-        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.far").value_or(4100.0)
+    auto bSpeed = rpm_t{
+        toml->get_table("shooter")->get_qualified_as<double>("shootingSpeed.b").value_or(2890)
     };
 
     m_IntakeBallsCommand        = new IntakeBallsCommand(m_Intake, m_PowerCellCounter);
@@ -72,14 +64,10 @@ RobotContainer::RobotContainer () {
     m_RetractIntakeCommand      = new RetractIntakeCommand(m_Intake);
     m_ExtendIntakeCommand       = new ExtendIntakeCommand(m_Intake);
     m_TeleopDriveCommand        = new TeleopDriveCommand(m_Drivetrain, &m_DriverJoystick);
-    m_TeleopShootCommand        = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
-    m_TeleopSlowShootCommand    = new ShootCommand(m_Shooter, m_Intake, farSpeed);
+    m_TeleopShootCommand        = new ShootCommand(m_Shooter, m_Intake, aSpeed);
+    m_TeleopSlowShootCommand    = new ShootCommand(m_Shooter, m_Intake, bSpeed);
     m_ReverseBrushesCommand     = new ReverseBrushesCommand(m_Intake);
 
-    m_ChallengeNearShootCommand     = new ShootCommand(m_Shooter, m_Intake, nearSpeed);
-    m_ChallengeNearMidShootCommand  = new ShootCommand(m_Shooter, m_Intake, nearMidSpeed);
-    m_ChallengeFarMidShootCommand   = new ShootCommand(m_Shooter, m_Intake, farMidSpeed);
-    m_ChallengeFarShootCommand      = new ShootCommand(m_Shooter, m_Intake, farSpeed);
 
     m_ControlWinchCommand   = new ControlWinchCommand(m_Climb, [=] { return m_ClimbJoystick.GetY(JoystickHand::kLeftHand); });
     m_RetractClimbCommand   = new RetractClimbCommand(m_Climb);
