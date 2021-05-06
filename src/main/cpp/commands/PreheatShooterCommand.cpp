@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#define kShooterRPM 4500_rpm
+#define kShooterRPM 3750_rpm
 
 PreheatShooterCommand::PreheatShooterCommand (Shooter* shooter) {
     AddRequirements(shooter);

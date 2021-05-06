@@ -267,7 +267,7 @@ std::shared_ptr<cpptoml::table> RobotContainer::LoadConfig (std::string path) {
 }
 
 void RobotContainer::InitAutonomousChooser () {
-    const rpm_t kShooterSpeed = 4500_rpm;
+    const rpm_t kShooterSpeed = 3750_rpm;
 
     frc2::SequentialCommandGroup* threeCellAutoCommand = new frc2::SequentialCommandGroup(
         frc2::StartEndCommand {
@@ -402,11 +402,75 @@ void RobotContainer::InitAutonomousChooser () {
         followerConfig
     );
 
+    frc2::SequentialCommandGroup driveThroughTrenchFar {
+        // Drive through trench picking up power cells
+        frc2::ParallelRaceGroup{
+            frc2::SequentialCommandGroup{
+                SimpleDriveCommand{0.3, 0.0, m_Drivetrain}.WithTimeout(4.7_s),
+                SimpleDriveCommand{0.2, 0.0, m_Drivetrain}.WithTimeout(0.4_s)
+            },
+            IntakeBallsCommand{m_Intake, m_PowerCellCounter}
+        },
+        // Reverse back to line
+        frc2::ParallelRaceGroup{
+            frc2::ParallelCommandGroup{
+                SimpleDriveCommand{-0.6, -0.02, m_Drivetrain}.WithTimeout(2.1_s),
+                AutonomousRotateTurretCommand{m_Shooter}.WithTimeout(0.5_s),
+            },
+            IntakeBallsCommand{m_Intake, m_PowerCellCounter},
+        },
+        // Decelerate
+        frc2::ParallelRaceGroup{
+            SimpleDriveCommand{-0.4, 0.0, m_Drivetrain}.WithTimeout(0.7_s),
+            IntakeBallsCommand{m_Intake, m_PowerCellCounter},
+            frc2::SequentialCommandGroup{
+                PreheatShooterCommand{m_Shooter},
+                AimCommand{m_Shooter}
+            }
+        },
+        frc2::ParallelRaceGroup{
+            SimpleDriveCommand{-0.2, 0.0, m_Drivetrain}.WithTimeout(0.5_s),
+            IntakeBallsCommand{m_Intake, m_PowerCellCounter},
+            AimCommand{m_Shooter}
+        },
+    };
+
+    frc2::SequentialCommandGroup* eightCellAutoCommand = new frc2::SequentialCommandGroup(
+        frc2::InstantCommand{
+            [=]() {
+                startTime = hal::fpga_clock::now();
+                m_Shooter->SetLimelightLight(true);
+            }
+        },
+        ExtendIntakeCommand{m_Intake},
+        frc2::ParallelRaceGroup{
+            frc2::SequentialCommandGroup{
+                PreheatShooterCommand{m_Shooter},
+                AutonomousRotateTurretCommand{m_Shooter}.WithTimeout(0.3_s),
+                AimCommand{m_Shooter}.WithTimeout(1.0_s)
+            },
+            IntakeBallsCommand{m_Intake, m_PowerCellCounter},
+        },
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(2.2_s),
+        std::move(driveThroughTrenchFar),
+        PreheatShooterCommand{m_Shooter},
+        AimCommand{m_Shooter}.WithTimeout(0.5_s),
+        AimShootCommand{kShooterSpeed, m_Shooter, m_Intake, m_PowerCellCounter}.WithTimeout(4.0_s),
+        frc2::InstantCommand{
+            [=] {
+                auto now = hal::fpga_clock::now();
+                auto delta = std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count() / 1.0E6;
+                std::cout << "Auto done in " << delta << " seconds" << std::endl;
+            }
+        }
+    );
+
     TestPixycamDetectorCommand* testPixycamDetector = new TestPixycamDetectorCommand(m_Pixy);
     TestPixycamPositionCommand* testPixycamPosition = new TestPixycamPositionCommand(m_Pixy);
 
     m_DashboardAutoChooser.SetDefaultOption("3 cell auto", threeCellAutoCommand);
     m_DashboardAutoChooser.AddOption("6 cell auto", sixCellAutoCommand);
+    m_DashboardAutoChooser.AddOption("8 cell auto", eightCellAutoCommand);
     m_DashboardAutoChooser.AddOption("close auto", closeShotAutoCommand);
     m_DashboardAutoChooser.AddOption("follow path - barrel racing", followPathBR);
     m_DashboardAutoChooser.AddOption("follow path - slalom", followPathS);
