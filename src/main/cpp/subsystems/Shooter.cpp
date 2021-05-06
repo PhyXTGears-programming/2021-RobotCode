@@ -47,14 +47,6 @@ Shooter::Shooter (std::shared_ptr<cpptoml::table> toml) {
     m_ShooterMotor1.SetInverted(false);
     m_ShooterMotor2.Follow(m_ShooterMotor1, true);
 
-    std::cout
-        << "velocity conversion factor| motor 1: "
-        << m_ShooterMotor1.GetEncoder().GetVelocityConversionFactor()
-        << "\t"
-        << "motor 2: "
-        << m_ShooterMotor2.GetEncoder().GetVelocityConversionFactor()
-        << std::endl;
-
     // Setup vision NT
     m_VisionTable = nt::NetworkTableInstance::GetDefault().GetTable("limelight-gears");
 
