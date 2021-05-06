@@ -12,6 +12,12 @@ void ControlWinchCommand::Initialize () {}
 void ControlWinchCommand::Execute () {
     double rightStickY = m_SpeedCheck();
 
+    if (rightStickY < -0.15) {
+        m_Climb->PistonRetract();
+    } else if (rightStickY > 0.15) {
+        m_Climb->PistonExtend();
+    }
+
     double speed = std::sqrt(std::fabs(rightStickY));
 
     if (!m_Climb->IsWinchLocked() && std::abs(rightStickY) > 0.15) {
