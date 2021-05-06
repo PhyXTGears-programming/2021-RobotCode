@@ -22,7 +22,6 @@ void IntakeBallsCommand::Initialize () {
 }
 
 void IntakeBallsCommand::Execute () {
-    std::cout << "Balls: " << m_PowerCellCounter->GetCount() << std::endl;
     // if (m_PowerCellCounter->GetCount() >= 5) {
     //     // If robot has 5 balls, stop intake & expel balls in intake
     //     m_Intake->IntakeReverse();

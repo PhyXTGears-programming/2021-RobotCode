@@ -12,9 +12,9 @@ void Robot::RobotPeriodic () {
 
     m_container.PollInput();
 
-    hal::fpga_clock::time_point now = hal::fpga_clock::now();
-    m_DeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(now - m_timePrev).count() / 1000000.0;
-    m_timePrev = now;
+    // hal::fpga_clock::time_point now = hal::fpga_clock::now();
+    // m_DeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(now - m_timePrev).count() / 1000000.0;
+    // m_timePrev = now;
 
     // Update rate (for logging)
     static int c = 0;
