@@ -31,6 +31,7 @@ class Intake : public frc2::SubsystemBase {
         void FeedShooterStart();
         void FeedLoadStart();
         void FeedStop();
+        void FeedReverse();
 
         bool IsExtended();
         bool IsPowerCellInFeeder();
@@ -51,7 +52,7 @@ class Intake : public frc2::SubsystemBase {
 
         struct {
             struct {
-                double load, shoot;
+                double load, shoot, reverse;
             } speed;
         } config;
 };

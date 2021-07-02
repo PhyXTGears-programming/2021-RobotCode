@@ -5,6 +5,7 @@
 Intake::Intake (std::shared_ptr<cpptoml::table> toml) {
     config.speed.load  = toml->get_qualified_as<double>("speed.load").value_or(0.0);
     config.speed.shoot = toml->get_qualified_as<double>("speed.shoot").value_or(0.0);
+    config.speed.reverse = toml->get_qualified_as<double>("speed.reverse").value_or(0.0);
 
     m_ConveyorMotor.SetInverted(true);
 }
@@ -65,6 +66,10 @@ void Intake::FeedLoadStart () {
 
 void Intake::FeedStop () {
     SetFeederSpeed(0.0);
+}
+
+void Intake::FeedReverse () {
+    SetFeederSpeed(config.speed.reverse);
 }
 
 bool Intake::IsExtended() {

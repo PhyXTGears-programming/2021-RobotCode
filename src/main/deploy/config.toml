@@ -19,6 +19,7 @@ shootingSpeed.b = 3750
 [intake]
 speed.load  = 0.725
 speed.shoot = 0.75
+speed.reverse = -0.5
 
 [controlPanel]
 extraDegrees = 90.0 # degrees to rotate past 3 rotations
