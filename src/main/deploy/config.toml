@@ -18,7 +18,7 @@ shootingSpeed.b = 3750
 
 [intake]
 speed.load  = 0.725
-speed.shoot = 0.75
+speed.shoot = 1.0
 speed.reverse = -0.5
 
 [controlPanel]
