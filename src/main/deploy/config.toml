@@ -13,8 +13,8 @@ shooterVelocity.i = 0.0
 shooterVelocity.d = 0.01
 shooterVelocity.f = 0.0002
 
-shootingSpeed.a = 2700
-shootingSpeed.b = 3750
+shootingSpeed.a = 3400
+shootingSpeed.b = 3200
 
 [intake]
 speed.load  = 0.725
